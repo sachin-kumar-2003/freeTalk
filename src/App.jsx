@@ -1,10 +1,18 @@
 import React from 'react'
-import VideoChat from './components/VideoChat'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Landing from './components/Landing'
+import Room from './components/Room'
 
-const App = () => {
+function App() {
   return (
-   <VideoChat />
-  );
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Landing/>} />
+          <Route path="/room" element={<Room />} />
+        </Routes>
+
+      </BrowserRouter>
+  )
 }
 
-export default App
+export default App;
