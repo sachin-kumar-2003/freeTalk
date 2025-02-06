@@ -1,60 +1,51 @@
+import { User } from "./User.js";
+
+let GLOBAL_ID = 1;
+
 class RoomManager {
   constructor() {
-    this.rooms = {};
+    this.rooms = new Map(); // Using Map instead of an object
   }
 
-  createRoom(roomId) {
-    if (!this.rooms[roomId]) {
-      this.rooms[roomId] = [];
-      return `Room ${roomId} created.`;
-    } else {
-      return `Room ${roomId} already exists.`;
+  createRoom(user1, user2) {
+    const roomId = this.generate(); // Fixed `generate()` method call
+
+    this.rooms.set(roomId.toString(), {
+      user1,
+      user2,
+    });
+
+    user1.socket.emit("new-room", {
+      type: "send-offer",
+      roomId,
+    });
+  }
+
+  onOffer(roomId, sdp) {
+    const room = this.rooms.get(roomId.toString());
+    if (room && room.user2) {
+      room.user2.socket.emit("new-room", {
+        type: "receive-offer",
+        roomId,
+        sdp, // Added sdp parameter
+      });
     }
   }
 
-  deleteRoom(roomId) {
-    if (this.rooms[roomId]) {
-      delete this.rooms[roomId];
-      return `Room ${roomId} deleted.`;
-    } else {
-      return `Room ${roomId} does not exist.`;
+  onAnswer(roomId, sdp) {
+    const room = this.rooms.get(roomId.toString());
+    if (room && room.user1) {
+      room.user1.socket.emit("new-room", {
+        type: "receive-answer",
+        roomId,
+        sdp, // Added sdp parameter
+      });
     }
   }
 
-  addUserToRoom(roomId, userId) {
-    if (this.rooms[roomId]) {
-      if (!this.rooms[roomId].includes(userId)) {
-        this.rooms[roomId].push(userId);
-        return `User ${userId} added to room ${roomId}.`;
-      } else {
-        return `User ${userId} already in room ${roomId}.`;
-      }
-    } else {
-      return `Room ${roomId} does not exist.`;
-    }
-  }
-
-  removeUserFromRoom(roomId, userId) {
-    if (this.rooms[roomId]) {
-      const userIndex = this.rooms[roomId].indexOf(userId);
-      if (userIndex !== -1) {
-        this.rooms[roomId].splice(userIndex, 1);
-        return `User ${userId} removed from room ${roomId}.`;
-      } else {
-        return `User ${userId} not found in room ${roomId}.`;
-      }
-    } else {
-      return `Room ${roomId} does not exist.`;
-    }
-  }
-
-  getUsersInRoom(roomId) {
-    if (this.rooms[roomId]) {
-      return this.rooms[roomId];
-    } else {
-      return `Room ${roomId} does not exist.`;
-    }
+  generate() {
+    return GLOBAL_ID++;
   }
 }
 
-module.exports = RoomManager;
+export default RoomManager;

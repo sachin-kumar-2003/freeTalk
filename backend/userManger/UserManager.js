@@ -1,8 +1,9 @@
 export class UserManager {
-  constructor() {
+  constructor(roomManager) {
     this.GLOBAL_ROOM_ID = 0;
     this.users = [];
     this.queue = [];
+    this.roomManager = roomManager; // Injecting RoomManager instance
   }
 
   addUser(name, socket) {
@@ -34,6 +35,10 @@ export class UserManager {
         type: "receive-offer",
         roomId
       });
+
+      if (this.roomManager && typeof this.roomManager.createRoom === 'function') {
+        const room = this.roomManager.createRoom(user1, user2);
+      }
     }
   }
 
