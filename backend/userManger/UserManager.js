@@ -3,11 +3,13 @@ class UserManager {
     this.GLOBAL_ROOM_ID = 0;
     this.users = [];
     this.queue = [];
-    this.roomManager = roomManager; 
+    this.roomManager = roomManager;
   }
 
   addUser(name, socket) {
     this.users.push({ name, socket });
+    this.queue.push(socket.id); // ✅ Add to queue for pairing
+    socket.emit("lobby"); // ✅ Use emit instead of send
     this.clearQueue();
     this.initHandlers(socket);
   }
@@ -18,12 +20,15 @@ class UserManager {
   }
 
   clearQueue() {
+    console.log("inside the clear queue")
     if (this.queue.length < 2) {
       return;
     }
 
-    const user1 = this.users.find(user => user.socket.id === this.queue.shift());
-    const user2 = this.users.find(user => user.socket.id === this.queue.shift());
+    const userId1 = this.queue.shift();
+    const userId2 = this.queue.shift();
+    const user1 = this.users.find(user => user.socket.id === userId1);
+    const user2 = this.users.find(user => user.socket.id === userId2);
 
     if (user1 && user2) {
       const roomId = this.generate();
@@ -31,6 +36,10 @@ class UserManager {
         type: "send-offer",
         roomId
       });
+      console.log("creating room")
+      console.log("romms id is ",roomId)
+      
+      
 
       user2.socket.emit('new-room', {
         type: "receive-offer",
@@ -45,10 +54,15 @@ class UserManager {
 
   initHandlers(socket) {
     socket.on("offer", (data) => {
-      this.roomManager.onOffer(data.roomId, data.sdp);
+      if (this.roomManager && typeof this.roomManager.onOffer === 'function') {
+        this.roomManager.onOffer(data.roomId, data.sdp);
+      }
     });
+
     socket.on("answer", (data) => {
-      this.roomManager.onAnswer(data.roomId, data.sdp);
+      if (this.roomManager && typeof this.roomManager.onAnswer === 'function') {
+        this.roomManager.onAnswer(data.roomId, data.sdp);
+      }
     });
   }
 
@@ -56,3 +70,5 @@ class UserManager {
     return this.GLOBAL_ROOM_ID++;
   }
 }
+
+module.exports = UserManager;
