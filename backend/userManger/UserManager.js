@@ -9,6 +9,7 @@ export class UserManager {
   addUser(name, socket) {
     this.users.push({ name, socket });
     this.clearQueue();
+    this.initHandlers(socket);
   }
 
   removeUser(socketId) {
@@ -41,7 +42,14 @@ export class UserManager {
       }
     }
   }
-
+  initHandlers(socket) {
+  socket.on("offer", (data) => {
+    this.roomManager.onOffer(data.roomId, data.sdp);
+  });
+  socket.on("answer",(data)=>{
+    this.roomManager.onAnswer(data.roomId,data.sdp);
+  })
+  }
   generate() {
     return this.GLOBAL_ROOM_ID++;
   }
