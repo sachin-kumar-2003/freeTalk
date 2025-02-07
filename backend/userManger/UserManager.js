@@ -1,9 +1,9 @@
-export class UserManager {
+class UserManager {
   constructor(roomManager) {
     this.GLOBAL_ROOM_ID = 0;
     this.users = [];
     this.queue = [];
-    this.roomManager = roomManager; // Injecting RoomManager instance
+    this.roomManager = roomManager; 
   }
 
   addUser(name, socket) {
@@ -38,18 +38,20 @@ export class UserManager {
       });
 
       if (this.roomManager && typeof this.roomManager.createRoom === 'function') {
-        const room = this.roomManager.createRoom(user1, user2);
+        this.roomManager.createRoom(user1, user2);
       }
     }
   }
+
   initHandlers(socket) {
-  socket.on("offer", (data) => {
-    this.roomManager.onOffer(data.roomId, data.sdp);
-  });
-  socket.on("answer",(data)=>{
-    this.roomManager.onAnswer(data.roomId,data.sdp);
-  })
+    socket.on("offer", (data) => {
+      this.roomManager.onOffer(data.roomId, data.sdp);
+    });
+    socket.on("answer", (data) => {
+      this.roomManager.onAnswer(data.roomId, data.sdp);
+    });
   }
+
   generate() {
     return this.GLOBAL_ROOM_ID++;
   }
