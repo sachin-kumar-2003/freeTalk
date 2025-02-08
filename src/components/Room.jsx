@@ -16,8 +16,8 @@ const Room = () => {
     const newSocket = io(URL, {
       autoConnect: true,
     });
-
-    newSocket.connect();
+    newSocket.connet()
+    // newSocket.connect();
 
     newSocket.on('send-offer', ({ roomId }) => {
       alert("send-offer please");
