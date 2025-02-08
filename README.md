@@ -7,7 +7,7 @@ This project is a template for setting up a React application using Vite. It pro
 To get started with this project, clone the repository and install the dependencies:
 
 ```bash
-git clone <repository-url>
+git clone "https://github.com/sachin-kumar-2003/freeTalk.git"
 cd <project-directory>
 npm install
 ```
