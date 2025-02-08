@@ -46,7 +46,7 @@ export const Landing = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your name"
-                    className="w-64 p-3 mb-4 text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-64 p-3 mb-4 text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 />
 
                 {/* Join Button */}
