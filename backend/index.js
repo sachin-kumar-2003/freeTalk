@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.static('public'));
 
 const UserManager = require('./userManger/UserManager');
-const userManager = new UserManager(); // ✅ Create an instance of UserManager
+const userManager = new UserManager(); // Create an instance of UserManager
 
 const io = new Server(server, {
   cors: {
@@ -23,7 +23,7 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  userManager.addUser(socket.id,socket); 
+  userManager.addUser(socket.id, socket); 
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);

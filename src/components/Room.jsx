@@ -6,18 +6,18 @@ const URL = "http://localhost:3000";
 
 const Room = () => {
   const [searchParams] = useSearchParams();
-  const [lobby,setLoby]=useState(true);
+  const [lobby, setLobby] = useState(true);
   const name = searchParams.get("name");
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    if (!name) return; // Prevent running if name is missing
+    if (!name) return;
 
     const newSocket = io(URL, {
-      autoConnect: false,
+      autoConnect: true,
     });
 
-    newSocket.connect(); // Ensure connection is established
+    newSocket.connect();
 
     newSocket.on('send-offer', ({ roomId }) => {
       alert("send-offer please");
@@ -28,13 +28,13 @@ const Room = () => {
       newSocket.emit('send-offer', { roomId, sdp, offer: "offer" });
     });
 
-    newSocket.on("lobby",()=>{
-      setLoby(true)
-    })
+    newSocket.on("lobby", () => {
+      setLobby(true);
+    });
 
     newSocket.on("offer", ({ roomId, offer }) => {
       alert("offer");
-      setLoby(false)
+      setLobby(false);
       // SDP placeholder (should be replaced with actual SDP from WebRTC)
       const sdp = "dummy-sdp"; 
 
@@ -51,16 +51,21 @@ const Room = () => {
       newSocket.disconnect(); // Clean up socket on unmount
     };
   }, [name]);
-  if(lobby){
-    return <>
-    <div>waiting for someone</div>
-    </>
+
+  if (lobby) {
+    return (
+      <>
+        <div>waiting for someone</div>
+      </>
+    );
   }
 
-  return <>
-  <video src="" width={400}></video>
-  <video src="" width={400}></video>
-  </>
+  return (
+    <>
+      <video src="" width={400}></video>
+      <video src="" width={400}></video>
+    </>
+  );
 };
 
 export default Room;
