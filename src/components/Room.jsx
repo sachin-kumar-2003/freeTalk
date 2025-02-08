@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { io } from "socket.io-client";
 
-const URL = "https://free-talk-woad.vercel.app/";
+const URL = "https://freetalk.onrender.com";
 
 export const Room = ({ name, localAudioTrack, localVideoTrack }) => {
     const [searchParams, setSearchParams] = useSearchParams();
