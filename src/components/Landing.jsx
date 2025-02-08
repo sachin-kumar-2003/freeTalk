@@ -32,14 +32,24 @@ export const Landing = () => {
 
     if (!joined) {
         return (
-            <div>
-                <video autoPlay ref={videoRef}></video>
+            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+                <h1 className="text-3xl font-bold mb-6">Join a Video Chat</h1>
+
+                {/* Local Video Preview */}
+                <div className="w-64 h-64 border-2 border-gray-600 rounded-lg overflow-hidden shadow-lg mb-4">
+                    <video autoPlay ref={videoRef} className="w-full h-full object-cover"></video>
+                </div>
+
+                {/* Name Input */}
                 <input 
-                    type="text" 
-                    value={name} 
-                    onChange={(e) => setName(e.target.value)} 
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your name"
+                    className="w-64 p-3 mb-4 text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+
+                {/* Join Button */}
                 <button 
                     onClick={() => {
                         if (!name.trim()) {
@@ -48,6 +58,7 @@ export const Landing = () => {
                         }
                         setJoined(true);
                     }}
+                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 transition text-lg font-semibold rounded-md shadow-lg"
                 >
                     Join
                 </button>

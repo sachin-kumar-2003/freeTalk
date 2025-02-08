@@ -27,11 +27,9 @@ export const Room = ({ name, localAudioTrack, localVideoTrack }) => {
             setSendingPc(pc);
 
             if (localVideoTrack) {
-                console.log("Added track:", localVideoTrack);
                 pc.addTrack(localVideoTrack);
             }
             if (localAudioTrack) {
-                console.log("Added track:", localAudioTrack);
                 pc.addTrack(localAudioTrack);
             }
 
@@ -46,7 +44,6 @@ export const Room = ({ name, localAudioTrack, localVideoTrack }) => {
             };
 
             pc.onnegotiationneeded = async () => {
-                console.log("Negotiation needed, sending offer...");
                 const sdp = await pc.createOffer();
                 pc.setLocalDescription(sdp);
                 socket.emit("offer", { sdp, roomId });
@@ -54,7 +51,6 @@ export const Room = ({ name, localAudioTrack, localVideoTrack }) => {
         });
 
         socket.on("offer", async ({ roomId, sdp: remoteSdp }) => {
-            console.log("Received offer...");
             setLobby(false);
             const pc = new RTCPeerConnection();
             pc.setRemoteDescription(remoteSdp);
@@ -66,8 +62,8 @@ export const Room = ({ name, localAudioTrack, localVideoTrack }) => {
                 remoteVideoRef.current.srcObject = stream;
             }
             setRemoteMediaStream(stream);
-
             setReceivingPc(pc);
+
             pc.ontrack = (e) => {
                 alert("ontrack event received");
             };
@@ -83,7 +79,7 @@ export const Room = ({ name, localAudioTrack, localVideoTrack }) => {
             };
 
             socket.emit("answer", { roomId, sdp });
-            
+
             setTimeout(() => {
                 const track1 = pc.getTransceivers()[0].receiver.track;
                 const track2 = pc.getTransceivers()[1].receiver.track;
@@ -110,7 +106,6 @@ export const Room = ({ name, localAudioTrack, localVideoTrack }) => {
                 pc?.setRemoteDescription(remoteSdp);
                 return pc;
             });
-            console.log("Loop closed");
         });
 
         socket.on("lobby", () => {
@@ -118,7 +113,6 @@ export const Room = ({ name, localAudioTrack, localVideoTrack }) => {
         });
 
         socket.on("add-ice-candidate", ({ candidate, type }) => {
-            console.log("Adding ICE candidate from remote:", candidate, type);
             if (type === "sender") {
                 setReceivingPc((pc) => {
                     if (pc) {
@@ -151,11 +145,34 @@ export const Room = ({ name, localAudioTrack, localVideoTrack }) => {
     }, [localVideoTrack]);
 
     return (
-        <div>
-            <p>Hi {name}</p>
-            <video autoPlay width={400} height={400} ref={localVideoRef} />
-            {lobby && <p>Waiting to connect you to someone...</p>}
-            <video autoPlay width={400} height={400} ref={remoteVideoRef} />
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+            <h1 className="text-3xl font-bold mb-4">Welcome, {name}!</h1>
+            
+            {/* Video Streams */}
+            <div className="flex gap-4 flex-wrap justify-center">
+                <div className="relative w-72 h-72 border-2 border-gray-600 rounded-lg overflow-hidden shadow-lg">
+                    <video autoPlay ref={localVideoRef} className="w-full h-full object-cover"></video>
+                    <p className="absolute bottom-2 left-2 bg-gray-700 px-2 py-1 text-sm rounded-md">You</p>
+                </div>
+
+                <div className="relative w-72 h-72 border-2 border-gray-600 rounded-lg overflow-hidden shadow-lg">
+                    <video autoPlay ref={remoteVideoRef} className="w-full h-full object-cover"></video>
+                    <p className="absolute bottom-2 left-2 bg-gray-700 px-2 py-1 text-sm rounded-md">Stranger</p>
+                </div>
+            </div>
+
+            {/* Connection Status */}
+            <div className="mt-4 text-lg">
+                {lobby ? "Waiting for a connection..." : "Connected"}
+            </div>
+
+            {/* Leave Button */}
+            <button 
+                className="mt-6 bg-red-600 hover:bg-red-700 transition px-6 py-2 rounded-md text-lg font-semibold shadow-lg"
+                onClick={() => window.location.href = "/"}
+            >
+                Leave Room
+            </button>
         </div>
     );
 };
